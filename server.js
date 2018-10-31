@@ -4,7 +4,7 @@ const path = require('path');
 const superagent = require('superagent');
 const bodyParser = require('body-parser');
 
-const pg = require('pg');
+//const pg = require('pg');
 require('dotenv').config()
 
 
@@ -35,7 +35,7 @@ function Book(info){
 
 function newSearch (req,res){
   // console.log(req.query );
-  res.render('pages/index');
+  res.render('pages/index.ejs');
 }
 function createSearch(req,res){
   // console.log(req.body.search);
@@ -44,6 +44,7 @@ function createSearch(req,res){
   if (req.body.search[1]==='title'){url += `+intitle:${req.body.search[0]}`;}
   if (req.body.search[1]==='author'){url += `+inauthor:${req.body.search[0]}`;}
 
+  
 
   superagent.get(url)
     .then(apiRes=>{
@@ -57,4 +58,8 @@ function createSearch(req,res){
     }).catch(() => res.render('pages/error'));
 }
 
+// let SQL ='Select * from books WHERE id=$1;';
+// let values =[ Request.query.book_id];
 
+// return clientInformation.query(SQL,values)
+// .then(result=> response.render('pages/detailview',result))
