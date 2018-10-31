@@ -1,43 +1,60 @@
 const express = require('express');
 const app = express();
+const path = require('path');
 const superagent = require('superagent');
+const bodyParser = require('body-parser');
+
+const pg = require('pg');
 require('dotenv').config()
 
-const PORT = process.env.PORT||3000
 
-// app.set('views', './views/pages');
+const PORT = process.env.PORT||300
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 app.set('view engine', 'ejs');
-app.get('/',newSearch)
+app.use(express.static('public'));
 
-  // res.render('pages/index');
+app.get('/',newSearch);
 
- 
+
 app.post('/searches',createSearch);
-// app.use(express.static(__dirname + '/views/pages'));
+
 app.listen(PORT,function(){
-    console.log(`server running at ${PORT}`);
+  console.log(`server running at ${PORT}`);
 });
 
-// function Book(info){
-//   const placeholder Image = 
-// }
+function Book(info){
+  this.title = info.title;
+  this.publisher = info.publisher;
+  this.publishedDate = info.publishedDate;
+  this.description = info.description;
+
+}
+
+// /const  all book = apires .body .item.slice(0,10)
 
 function newSearch (req,res){
+  // console.log(req.query );
   res.render('pages/index');
 }
 function createSearch(req,res){
-   let URL = 'https://www.googleapis.com/books/v1/volumes?q='
+  // console.log(req.body.search);
+  let url = 'https://www.googleapis.com/books/v1/volumes?q=';
 
-   if (request.body.search[1]==='title'){Url += `+intitle:${req.body.serach[0]}`;}
-   if (request.body.search[1]==='title'){Url += `+inauthor:${request.body.serach[0]}`;}
-   
-   
-   superagent .get (url)
-   .then(apiResponse=>apiResponse.body.item.map(bookResalt=> new Book (bookResalt.volumeinfo)))
-   .then(results=>{
-   response.render('pages/show',{items:results})
+  if (req.body.search[1]==='title'){url += `+intitle:${req.body.search[0]}`;}
+  if (req.body.search[1]==='author'){url += `+inauthor:${req.body.search[0]}`;}
 
-})
+
+  superagent.get(url)
+    .then(apiRes=>{
+      console.log(apiRes.body.items);
+      return apiRes.body.items.map(bookResult=> new Book(bookResult.volumeInfo))})
+    .then(results=>{
+      console.log(results);
+      res.render('pages/searches/show',{items: results})
+      res.sendFile(path.join(__dirname,'/public/styles/base.css'));
+
+    }).catch(() => res.render('pages/error'));
 }
- 
+
 
