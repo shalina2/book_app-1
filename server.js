@@ -1,27 +1,27 @@
 const express = require('express');
-const app = express();
+const pg = require('pg');
 const path = require('path');
 const superagent = require('superagent');
-const bodyParser = require('body-parser');
-
-const pg = require('pg');
 require('dotenv').config()
 
+const app = express();
+const PORT = process.env.PORT || 3000   
 
-const PORT = process.env.PORT||300
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
-app.set('view engine', 'ejs');
+// Connecting to database
+const client = new pg.Client(process.env.DATABASE_URL);
+client.connect();
+client.on('error', error => console.error(error));
+
 app.use(express.static('public'));
+app.use(express.urlencoded({extended: true}));
+
+app.set('view engine', 'ejs');
 
 app.get('/',newSearch);
 
-
 app.post('/searches',createSearch);
 
-app.listen(PORT,function(){
-  console.log(`server running at ${PORT}`);
-});
+app.listen(PORT, () => console.log(`server running on PORT: ${PORT}`));
 
 function Book(info){
   this.title = info.title;
